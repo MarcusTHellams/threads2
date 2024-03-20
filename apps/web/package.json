@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint . --max-warnings 0"
+    "_dev": "next dev",
+    "_build": "next build",
+    "_start": "next start",
+    "_lint": "eslint . --max-warnings 0"
   },
   "dependencies": {
     "@repo/ui": "*",
