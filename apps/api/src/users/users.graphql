@@ -1,0 +1,34 @@
+scalar Date
+
+type User {
+  userId: String!
+  email: String!
+  password: String!
+  profilePic: String
+  bio: String
+  isFrozen: Boolean
+  createdAt: Date!
+  updatedAt: Date!
+  followers: [User]
+  follows: [User]
+}
+
+input CreateUserInput {
+  # Example field (placeholder)
+  exampleField: Int
+}
+
+input UpdateUserInput {
+  id: Int!
+}
+
+type Query {
+  users: [User]!
+  user(id: String!): User
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User
+}
