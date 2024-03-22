@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
 import groupBy from 'lodash/groupBy';
+import keyBy from 'lodash/keyBy';
 import DataLoader from 'dataloader';
 
 @Injectable()
@@ -10,23 +11,26 @@ export class UserDataLoader {
   private batchFollowers() {
     const db = this.client.db;
     return async function (ids: string[]) {
-      console.log('ids: ', ids);
-      const followers = await db.query.follow.findMany({
-        where({ followeeId }, { inArray }) {
-          return inArray(followeeId, ids);
+      const followers = await db.query.user.findMany({
+        where({ userId }, { inArray }) {
+          return inArray(userId, ids);
         },
+        columns: { userId: true },
         with: {
-          follower: true,
+          followers: {
+            columns: {},
+            with: {
+              follower: true,
+            },
+          },
         },
       });
-      console.log('followers: ', JSON.stringify(followers, null, 2));
-
-      const groupedByFollowers = groupBy(followers, (follower) => {
-        return follower.followeeId;
+      const keyedByFollowers = keyBy(followers, (follower) => {
+        return follower.userId;
       });
 
       return ids.map((id) => {
-        return groupedByFollowers[id].map((item) => item.follower);
+        return keyedByFollowers[id].followers.map((f) => f.follower);
       });
     };
   }
@@ -36,25 +40,54 @@ export class UserDataLoader {
   private batchFollowees() {
     const db = this.client.db;
     return async function (ids: string[]) {
-      const followees = await db.query.follow.findMany({
-        where({ followerId }, { inArray }) {
-          return inArray(followerId, ids);
+      const followees = await db.query.user.findMany({
+        where({ userId }, { inArray }) {
+          return inArray(userId, ids);
         },
         with: {
-          followee: true,
+          follows: {
+            with: {
+              followee: true,
+            },
+          },
         },
       });
-
-      const groupedByFollowees = groupBy(followees, (followee) => {
-        return followee.followerId;
+      const keyedByFollowees = keyBy(followees, (follower) => {
+        return follower.userId;
       });
 
       return ids.map((id) => {
-        return groupedByFollowees[id].map((item) => item.followee);
+        return keyedByFollowees[id].follows.map((f) => f.followee);
       });
     };
   }
   public useFolloweeLoader() {
     return new DataLoader(this.batchFollowees());
+  }
+  private batchPosts() {
+    const db = this.client.db;
+    return async function (ids: string[]) {
+      const users = await db.query.user.findMany({
+        where({ userId }, { inArray }) {
+          return inArray(userId, ids);
+        },
+        columns: {
+          userId: true,
+        },
+        with: {
+          posts: true,
+        },
+      });
+      const keyedByUsers = keyBy(users, (user) => {
+        return user.userId;
+      });
+
+      return ids.map((id) => {
+        return keyedByUsers[id].posts;
+      });
+    };
+  }
+  public usePostsLoader() {
+    return new DataLoader(this.batchPosts());
   }
 }

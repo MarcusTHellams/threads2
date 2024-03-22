@@ -15,6 +15,8 @@ import {
 } from 'graphql-scalars';
 import { UserDataLoader } from './users/users.dataloader';
 import { Context } from './common/types';
+import { PostsModule } from './posts/posts.module';
+import { PostDataLoader } from './posts/posts.dataloader';
 
 @Module({
   imports: [
@@ -22,16 +24,14 @@ import { Context } from './common/types';
       driver: ApolloDriver,
       imports: [UsersModule],
       inject: [UserDataLoader],
-      async useFactory(dataLoader: UserDataLoader) {
+      async useFactory(dataLoader: UserDataLoader, postdl: PostDataLoader) {
         return {
-          // context: {
-          //   userFolloweeLoader: dataLoader.useFolloweeLoader(),
-          //   userFollowLoader: dataLoader.useFollowerLoader(),
-          // },
           context(): Context {
             return {
               userFolloweeLoader: dataLoader.useFolloweeLoader(),
               userFollowLoader: dataLoader.useFollowerLoader(),
+              usePostsLoader: dataLoader.usePostsLoader(),
+              usePostedByLoader: postdl.usePostedByLoader(),
             };
           },
           resolvers: { ...scalarResolvers },
@@ -51,6 +51,7 @@ import { Context } from './common/types';
     }),
     DrizzleModule,
     UsersModule,
+    PostsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

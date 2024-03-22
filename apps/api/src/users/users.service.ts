@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
-import { UpdateUserInput } from './dto/update-user.input';
 import { DrizzleService } from 'src/drizzle/drizzle.service';
+import { user, UserInsert } from 'database';
+import { eq } from 'drizzle-orm';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +12,8 @@ export class UsersService {
   }
 
   findAll() {
-    return this.ds.db.query.user.findMany({
+    const db = this.ds.db;
+    return db.query.user.findMany({
       with: {
         followers: {
           with: {
@@ -22,15 +24,27 @@ export class UsersService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  findOne(id: string) {
+    const db = this.ds.db;
+    return db.query.user.findFirst({
+      where({ userId }, { eq }) {
+        return eq(userId, id);
+      },
+    });
   }
 
-  update(id: number, updateUserInput: UpdateUserInput) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserInput: Partial<UserInsert>) {
+    const db = this.ds.db;
+    return db
+      .update(user)
+      .set({ ...updateUserInput, updatedAt: new Date() })
+      .where(eq(user.userId, id))
+      .returning()
+      .then((resp) => resp[0]);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    const db = this.ds.db;
+    return db.delete(user).where(eq(user.userId, id)).returning();
   }
 }

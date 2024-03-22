@@ -16,7 +16,7 @@ export class DrizzleService implements OnModuleInit, OnModuleDestroy {
       database: this.configService.get('DATABASE_NAME'),
       ssl: true,
     });
-    this.db = drizzle(this.client, { schema });
+    this.db = drizzle(this.client, { schema, logger: true });
   }
   onModuleInit() {
     this.client

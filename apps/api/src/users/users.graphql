@@ -1,9 +1,9 @@
 scalar Date
 
 type User {
+  name: String!
   userId: String!
   email: String!
-  password: String!
   profilePic: String
   bio: String
   isFrozen: Boolean
@@ -11,15 +11,29 @@ type User {
   updatedAt: Date!
   followers: [User]
   follows: [User]
+  likes: [Like]
+  posts: [Post]
 }
 
 input CreateUserInput {
-  # Example field (placeholder)
-  exampleField: Int
+  name: String!
+  userId: String!
+  email: String!
+  profilePic: String
+  bio: String
+  isFrozen: Boolean
 }
 
 input UpdateUserInput {
-  id: Int!
+  name: String
+  userId: String
+  email: String
+  password: String
+  profilePic: String
+  bio: String
+  isFrozen: Boolean
+  createdAt: Date
+  updatedAt: Date
 }
 
 type Query {
@@ -30,5 +44,5 @@ type Query {
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
-  removeUser(id: Int!): User
+  removeUser(id: String!): User
 }

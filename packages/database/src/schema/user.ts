@@ -8,7 +8,7 @@ import {
   varchar,
 } from 'drizzle-orm/pg-core';
 
-import { conversationToUser, follow, like, message, reply } from '.';
+import { conversationToUser, follow, like, message, post, reply } from '.';
 
 export const user = pgTable('User', {
   userId: uuid('userId').defaultRandom().primaryKey(),
@@ -34,6 +34,7 @@ export const usersRelations = relations(user, ({ many }) => ({
   replies: many(reply),
   conversations: many(conversationToUser),
   messages: many(message),
+  posts: many(post),
 }));
 
 export type UserSelect = InferSelectModel<typeof user>;

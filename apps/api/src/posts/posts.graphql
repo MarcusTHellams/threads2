@@ -1,0 +1,39 @@
+type Post {
+  postId: String!
+  userId: String!
+  text: String!
+  image: String
+  createdAt: Date!
+  updatedAt: Date!
+  likes: [Like]
+  postedBy: User!
+}
+
+input CreatePostInput {
+  postId: String
+  userId: String!
+  text: String!
+  image: String
+  createdAt: Date
+  updatedAt: Date!
+}
+
+input UpdatePostInput {
+  postId: String
+  userId: String
+  text: String
+  image: String
+  createdAt: Date
+  updatedAt: Date
+}
+
+type Query {
+  posts: [Post]!
+  post(id: String!): Post
+}
+
+type Mutation {
+  createPost(createPostInput: CreatePostInput!): Post!
+  updatePost(updatePostInput: UpdatePostInput!): Post!
+  removePost(id: String!): Post
+}
