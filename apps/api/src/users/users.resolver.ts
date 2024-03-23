@@ -61,4 +61,11 @@ export class UsersResolver {
   async posts(@Parent() parent: User, @Ctx() { usePostsLoader }: Context) {
     return usePostsLoader.load(parent.userId);
   }
+  @ResolveField()
+  async likes(
+    @Parent() parent: User,
+    @Ctx() { useLikesForUserLoader }: Context,
+  ) {
+    return useLikesForUserLoader.load(parent.userId);
+  }
 }

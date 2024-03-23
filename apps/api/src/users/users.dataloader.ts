@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { DrizzleService } from 'src/drizzle/drizzle.service';
-import groupBy from 'lodash/groupBy';
-import keyBy from 'lodash/keyBy';
 import DataLoader from 'dataloader';
+import keyBy from 'lodash/keyBy';
+import { DrizzleService, DatabaseClient } from 'src/drizzle/drizzle.service';
 
 @Injectable()
 export class UserDataLoader {
-  constructor(private readonly client: DrizzleService) {}
+  db: DatabaseClient;
+  constructor(private readonly client: DrizzleService) {
+    this.db = this.client.db;
+  }
 
   private batchFollowers() {
     const db = this.client.db;
@@ -89,5 +91,31 @@ export class UserDataLoader {
   }
   public usePostsLoader() {
     return new DataLoader(this.batchPosts());
+  }
+  private batchLikes() {
+    const db = this.client.db;
+    return async function (ids: string[]) {
+      const users = await db.query.user.findMany({
+        where({ userId }, { inArray }) {
+          return inArray(userId, ids);
+        },
+        columns: {
+          userId: true,
+        },
+        with: {
+          likes: true,
+        },
+      });
+      const keyedByUsers = keyBy(users, (user) => {
+        return user.userId;
+      });
+
+      return ids.map((id) => {
+        return keyedByUsers[id].likes;
+      });
+    };
+  }
+  public useLikesForUserLoader() {
+    return new DataLoader(this.batchLikes());
   }
 }

@@ -47,6 +47,11 @@ export class UpdateUserInput {
     updatedAt?: Nullable<Date>;
 }
 
+export class LikeAPostInput {
+    postId: string;
+    userId: string;
+}
+
 export class Like {
     postId: string;
     userId: string;
@@ -88,6 +93,8 @@ export abstract class IMutation {
     abstract updateUser(updateUserInput: UpdateUserInput): User | Promise<User>;
 
     abstract removeUser(id: string): Nullable<User> | Promise<Nullable<User>>;
+
+    abstract likeAPost(likeAPostInput: LikeAPostInput): Nullable<Post> | Promise<Nullable<Post>>;
 }
 
 export class User {

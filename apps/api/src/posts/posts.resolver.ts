@@ -47,4 +47,11 @@ export class PostsResolver {
   ) {
     return usePostedByLoader.load(parent.postId);
   }
+  @ResolveField()
+  async likes(
+    @Parent() parent: Post,
+    @Ctx() { useLikeLoaderForPost }: Context,
+  ) {
+    return useLikeLoaderForPost.load(parent.postId);
+  }
 }

@@ -22,8 +22,8 @@ import { PostDataLoader } from './posts/posts.dataloader';
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [UsersModule],
-      inject: [UserDataLoader],
+      imports: [UsersModule, PostsModule],
+      inject: [UserDataLoader, PostDataLoader],
       async useFactory(dataLoader: UserDataLoader, postdl: PostDataLoader) {
         return {
           context(): Context {
@@ -32,6 +32,8 @@ import { PostDataLoader } from './posts/posts.dataloader';
               userFollowLoader: dataLoader.useFollowerLoader(),
               usePostsLoader: dataLoader.usePostsLoader(),
               usePostedByLoader: postdl.usePostedByLoader(),
+              useLikeLoaderForPost: postdl.useLikeLoaderForPost(),
+              useLikesForUserLoader: dataLoader.useLikesForUserLoader(),
             };
           },
           resolvers: { ...scalarResolvers },

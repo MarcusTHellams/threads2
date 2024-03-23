@@ -4,6 +4,8 @@ import { ConfigService } from '@nestjs/config';
 import { Client } from 'pg';
 import { drizzle, type NodePgDatabase } from 'drizzle-orm/node-postgres';
 
+export type DatabaseClient = NodePgDatabase<typeof schema>;
+
 @Injectable()
 export class DrizzleService implements OnModuleInit, OnModuleDestroy {
   private client: Client;
