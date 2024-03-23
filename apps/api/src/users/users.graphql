@@ -17,8 +17,8 @@ type User {
 
 input CreateUserInput {
   name: String!
-  userId: String!
   email: String!
+  password: String!
   profilePic: String
   bio: String
   isFrozen: Boolean

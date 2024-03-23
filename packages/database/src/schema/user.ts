@@ -17,6 +17,7 @@ export const user = pgTable('User', {
   password: varchar('password', { length: 100 }).notNull(),
   profilePic: text('profilePic'),
   bio: text('bio'),
+  refreshToken: text('refreshToken'),
   isFrozen: boolean('isFrozen').default(false),
   createdAt: timestamp('createdAt', { mode: 'date', withTimezone: true })
     .defaultNow()

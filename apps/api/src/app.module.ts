@@ -17,6 +17,7 @@ import { UserDataLoader } from './users/users.dataloader';
 import { Context } from './common/types';
 import { PostsModule } from './posts/posts.module';
 import { PostDataLoader } from './posts/posts.dataloader';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { PostDataLoader } from './posts/posts.dataloader';
     DrizzleModule,
     UsersModule,
     PostsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

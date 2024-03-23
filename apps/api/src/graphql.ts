@@ -28,8 +28,8 @@ export class UpdatePostInput {
 
 export class CreateUserInput {
     name: string;
-    userId: string;
     email: string;
+    password: string;
     profilePic?: Nullable<string>;
     bio?: Nullable<string>;
     isFrozen?: Nullable<boolean>;
