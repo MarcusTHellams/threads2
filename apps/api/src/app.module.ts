@@ -26,10 +26,10 @@ import { Request } from 'express';
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       imports: [UsersModule, PostsModule],
-inject: [UserDataLoader, PostDataLoader],
+      inject: [UserDataLoader, PostDataLoader],
       async useFactory(dataLoader: UserDataLoader, postdl: PostDataLoader) {
         return {
-          context({req, res}): Context {
+          context({ req, res }): Context {
             return {
               userFolloweeLoader: dataLoader.useFolloweeLoader(),
               userFollowLoader: dataLoader.useFollowerLoader(),
@@ -37,8 +37,8 @@ inject: [UserDataLoader, PostDataLoader],
               usePostedByLoader: postdl.usePostedByLoader(),
               useLikeLoaderForPost: postdl.useLikeLoaderForPost(),
               useLikesForUserLoader: dataLoader.useLikesForUserLoader(),
-              req:req,
-              res:res,
+              req: req,
+              res: res,
             };
           },
           resolvers: { ...scalarResolvers },

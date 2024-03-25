@@ -48,7 +48,7 @@ export class AuthController {
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(req['user']['userId']);
     res
-      .clearCookie('accessToken', cookieOptions)
+      .clearCookie('refreshToken', cookieOptions)
       .send('Successfully Logged Out');
   }
 

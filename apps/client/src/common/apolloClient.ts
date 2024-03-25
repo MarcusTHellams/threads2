@@ -1,82 +1,60 @@
 import {
-  ApolloClient,
-  HttpLink,
-  ApolloLink,
-  InMemoryCache,
-  concat,
+	ApolloClient,
+	HttpLink,
+	InMemoryCache,
+	fromPromise,
 } from '@apollo/client';
+
+import { onError } from '@apollo/client/link/error';
+
 import { api } from './api';
-import { TokenRefreshLink } from 'apollo-link-token-refresh';
 
-const httpLink = new HttpLink({ uri: `${window.location.origin}/graphql` });
+const ACCESS_TOKEN = 'accessToken';
 
-const tokenRefreshLink = new TokenRefreshLink({
-  async fetchAccessToken() {
-    return api.get('/auth/refresh').then((resp) => resp.data);
-  },
-  accessTokenField: 'accessToken',
-  handleFetch(accesstoken) {
-    console.log('accesstoken: ', accesstoken);
-  },
-  handleResponse(operation, token) {
-    return { token };
-  },
-  async isTokenValidOrUndefined() {
-    return false;
-  },
+const httpLink = new HttpLink({
+  uri: `${window.location.origin}/graphql`,
+	headers: {
+		authorization: `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`,
+	},
 });
 
-const authMiddleware = new ApolloLink((operation, forward) => {
-  (async () => {
-    const { data } = await api.get('/auth/refresh');
-    console.log('data: ', data);
-  })();
-  // add the authorization to the headers
-  operation.setContext(({ headers = {} }) => ({
-    headers: {
-      ...headers,
-      authorization: localStorage.getItem('accessToken') || null,
-    },
-  }));
+// Define your token refresh function
+const getNewToken = async () => {
+	return api.get('/auth/refresh').then((response) => {
+		// Extract your accessToken from the response data and return it
+		const { accessToken } = response.data;
+		return accessToken;
+	});
+};
 
-  return forward(operation);
+// Set up the onError link
+const errorLink = onError(({ graphQLErrors, operation, forward }) => {
+	if (graphQLErrors) {
+		for (const err of graphQLErrors) {
+			switch (err.extensions.code) {
+				case 'UNAUTHENTICATED':
+					return fromPromise(
+						getNewToken().catch(() => {
+							localStorage.removeItem(ACCESS_TOKEN);
+						})
+					)
+						.filter((value) => Boolean(value))
+						.flatMap((accessToken) => {
+							localStorage.setItem('accessToken', accessToken);
+							operation.setContext(({ headers = {} }) => ({
+								headers: {
+									...headers,
+									authorization: `Bearer ${accessToken}`,
+								},
+							}));
+							return forward(operation);
+						});
+			}
+		}
+	}
 });
-
-// const authMiddleware = new ApolloLink((operation, forward) => {
-//   // add the authorization to the headers
-//   operation.setContext(({ headers = {} }) => ({
-//     headers: {
-//       ...headers,
-//       authorization: `Bearer ${localStorage.getItem('accessToken') || null}`,
-//     },
-//   }));
-
-//   return forward(operation).map((response) => {
-//     console.log('response.errors: ', response.errors);
-
-//     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//     // @ts-expect-error
-//     if (response?.errors?.[0]?.extensions?.originalError?.statusCode === 401) {
-//       (async () => {
-//         const refreshToken = localStorage.getItem('refreshToken');
-//         const {
-//           data: { accessToken },
-//         } = await api.get<{
-//           accessToken: string;
-//           refreshToken: string;
-//         }>('/auth/refresh', {
-//           headers: {
-//             setAuthorization: `Bearer ${refreshToken}`,
-//           },
-//         });
-//         localStorage.setItem('refreshToken')
-//       })();
-//     }
-//     return response;
-//   });
-// });
 
 export const apolloClient = new ApolloClient({
-  cache: new InMemoryCache(),
-  link: authMiddleware.concat(httpLink),
+	cache: new InMemoryCache(),
+	link: errorLink.concat(httpLink),
 });
