@@ -5,3 +5,7 @@ type Like {
   updatedAt: Date!
   user: User!
 }
+
+type Query {
+  helloWorld: String!
+}

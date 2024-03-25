@@ -36,6 +36,7 @@
     "@nestjs/serve-static": "^4.0.1",
     "api": "^6.1.1",
     "argon2": "^0.40.1",
+    "cookie-parser": "^1.4.6",
     "database": "*",
     "dataloader": "^2.2.2",
     "drizzle-orm": "^0.30.4",
@@ -49,6 +50,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
+    "@types/cookie-parser": "^1.4.7",
     "@nestjs/schematics": "^10.0.0",
     "@nestjs/testing": "^10.0.0",
     "@types/argon2": "^0.15.0",

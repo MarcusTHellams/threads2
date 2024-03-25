@@ -4,7 +4,7 @@ import {
   DrizzleService,
   type DatabaseClient,
 } from 'src/drizzle/drizzle.service';
-import { user, UserInsert, post, like } from 'database';
+import { user, UserInsert, like } from 'database';
 import { and, eq } from 'drizzle-orm';
 import { LikeAPostInput } from '../graphql';
 
@@ -18,7 +18,7 @@ export class UsersService {
     return 'This action adds a new user';
   }
 
-  findAll() {
+  async findAll() {
     const db = this.ds.db;
     return db.query.user.findMany({
       with: {

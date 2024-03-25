@@ -18,16 +18,18 @@ import { Context } from './common/types';
 import { PostsModule } from './posts/posts.module';
 import { PostDataLoader } from './posts/posts.dataloader';
 import { AuthModule } from './auth/auth.module';
+import { HelloWorldResolver } from './hello-world/hello-world.resolver';
+import { Request } from 'express';
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
       imports: [UsersModule, PostsModule],
-      inject: [UserDataLoader, PostDataLoader],
+inject: [UserDataLoader, PostDataLoader],
       async useFactory(dataLoader: UserDataLoader, postdl: PostDataLoader) {
         return {
-          context(): Context {
+          context({req, res}): Context {
             return {
               userFolloweeLoader: dataLoader.useFolloweeLoader(),
               userFollowLoader: dataLoader.useFollowerLoader(),
@@ -35,6 +37,8 @@ import { AuthModule } from './auth/auth.module';
               usePostedByLoader: postdl.usePostedByLoader(),
               useLikeLoaderForPost: postdl.useLikeLoaderForPost(),
               useLikesForUserLoader: dataLoader.useLikesForUserLoader(),
+              req:req,
+              res:res,
             };
           },
           resolvers: { ...scalarResolvers },
@@ -58,6 +62,6 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, HelloWorldResolver],
 })
 export class AppModule {}

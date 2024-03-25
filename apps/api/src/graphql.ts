@@ -60,6 +60,18 @@ export class Like {
     user: User;
 }
 
+export abstract class IQuery {
+    abstract helloWorld(): string | Promise<string>;
+
+    abstract posts(): Nullable<Post>[] | Promise<Nullable<Post>[]>;
+
+    abstract post(id: string): Nullable<Post> | Promise<Nullable<Post>>;
+
+    abstract users(): Nullable<User>[] | Promise<Nullable<User>[]>;
+
+    abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
+}
+
 export class Post {
     postId: string;
     userId: string;
@@ -69,16 +81,6 @@ export class Post {
     updatedAt: Date;
     likes?: Nullable<Nullable<Like>[]>;
     postedBy: User;
-}
-
-export abstract class IQuery {
-    abstract posts(): Nullable<Post>[] | Promise<Nullable<Post>[]>;
-
-    abstract post(id: string): Nullable<Post> | Promise<Nullable<Post>>;
-
-    abstract users(): Nullable<User>[] | Promise<Nullable<User>[]>;
-
-    abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
 }
 
 export abstract class IMutation {

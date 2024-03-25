@@ -1,11 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { DatabaseClient, DrizzleService } from 'src/drizzle/drizzle.service';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { CreateUserInput } from 'src/graphql';
-import { user, UserSelect } from 'database';
+import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
+import { user, UserSelect } from 'database';
 import { eq } from 'drizzle-orm';
+import { DatabaseClient, DrizzleService } from 'src/drizzle/drizzle.service';
+import { CreateUserInput } from 'src/graphql';
 
 @Injectable()
 export class AuthService {
@@ -112,13 +112,13 @@ export class AuthService {
       },
     });
     if (!user || !user.refreshToken)
-      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      throw new HttpException('Access Denied', HttpStatus.UNAUTHORIZED);
     const refreshTokenMatches = await argon2.verify(
       user.refreshToken,
       refreshToken,
     );
     if (!refreshTokenMatches)
-      throw new HttpException('Access Denied', HttpStatus.FORBIDDEN);
+      throw new HttpException('Access Denied', HttpStatus.UNAUTHORIZED);
     const tokens = await this.getTokens(user);
     await this.updateRefreshToken(user, tokens.refreshToken);
     return tokens;
