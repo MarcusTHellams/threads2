@@ -1,15 +1,9 @@
-import { useColorMode, Button } from '@chakra-ui/react';
+import { useAuthStore } from '../stores/authStore';
+import { LoginCard } from './components/LoginCard';
+import { SignupCard } from './components/SignupCard';
 
 export const Auth = () => {
-  const { colorMode, toggleColorMode } = useColorMode();
-  return (
-    <div>
-      <header>
-        <p>Auth</p>
-        <Button onClick={toggleColorMode}>
-          Toggle {colorMode === 'light' ? 'Dark' : 'Light'}
-        </Button>
-      </header>
-    </div>
-  );
+	const authScreenState = useAuthStore(({ auth }) => auth);
+
+	return <>{authScreenState === 'login' ? <LoginCard /> : <SignupCard />}</>;
 };

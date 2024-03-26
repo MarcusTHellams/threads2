@@ -1,13 +1,13 @@
+import { ApolloProvider } from '@apollo/client';
+import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
-import { ApolloProvider } from '@apollo/client';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { RouterProvider } from 'react-router-dom';
 import { apolloClient } from './common/apolloClient.ts';
-import { ChakraProvider } from '@chakra-ui/react';
-import { ColorModeScript } from '@chakra-ui/react';
+import { router } from './common/routes.tsx';
 import theme from './common/theme.ts';
+import './index.css';
 
 const client = new QueryClient({
   defaultOptions: {
@@ -24,7 +24,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <ApolloProvider client={apolloClient}>
         <QueryClientProvider client={client}>
-          <App />
+        <RouterProvider router={router} />
         </QueryClientProvider>
       </ApolloProvider>
     </ChakraProvider>

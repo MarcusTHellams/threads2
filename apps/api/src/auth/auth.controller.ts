@@ -14,10 +14,15 @@ import { AccessTokenGuard } from './accessToken.guard';
 import { RefreshTokenGuard } from './refreshToken.guard';
 import { cookieOptions, tokenAndCookieSender } from './tokenAndCookieSender';
 import { extractJWTFromCookie } from './refreshToken.strategy';
+import { JwtService } from '@nestjs/jwt';
+import { UserSelect } from 'database';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly jwtService: JwtService,
+  ) {}
 
   @Post('signup')
   async signUp(
@@ -25,7 +30,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.signUp(body);
-    tokenAndCookieSender(res, tokens);
+    const user = await this.getUserFromToken(tokens.accessToken);
+    tokenAndCookieSender(res, tokens, user);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -40,7 +46,8 @@ export class AuthController {
     @Res({ passthrough: true }) res: Response,
   ) {
     const tokens = await this.authService.signIn(body);
-    tokenAndCookieSender(res, tokens);
+    const user = await this.getUserFromToken(tokens.accessToken);
+    tokenAndCookieSender(res, tokens, user);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -61,6 +68,12 @@ export class AuthController {
     const userId = req['user']['userId'];
     const refreshToken = extractJWTFromCookie(req);
     const tokens = await this.authService.refreshTokens(userId, refreshToken);
-    tokenAndCookieSender(res, tokens);
+    const user = await this.getUserFromToken(tokens.accessToken);
+    tokenAndCookieSender(res, tokens, user);
+  }
+
+  private async getUserFromToken(token: string) {
+    const user = (await this.jwtService.decode(token)) as UserSelect;
+    return user;
   }
 }
