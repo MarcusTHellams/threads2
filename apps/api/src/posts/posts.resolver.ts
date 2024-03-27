@@ -10,6 +10,10 @@ import {
 import { PostsService } from './posts.service';
 import { CreatePostInput, Post, UpdatePostInput } from 'src/graphql';
 import { Context } from 'src/common/types';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/accessTokenGraphql.guard';
+import { CurrentUser } from 'src/auth/currentUser.decorator';
+import { UserSelect } from 'database';
 
 @Resolver('Post')
 export class PostsResolver {
@@ -30,14 +34,20 @@ export class PostsResolver {
     return this.postsService.findOne(id);
   }
 
+  @UseGuards(GqlAuthGuard)
+  @Query('feed')
+  feed(@CurrentUser() user: UserSelect) {
+    return this.postsService.feed(user);
+  }
+
   @Mutation('updatePost')
   update(@Args('updatePostInput') updatePostInput: UpdatePostInput) {
     return this.postsService.update(updatePostInput.postId, updatePostInput);
   }
 
   @Mutation('removePost')
-  remove(@Args('id') id: number) {
-    return this.postsService.remove(id);
+  remove(@Args('id') postId: string) {
+    return this.postsService.remove(postId);
   }
 
   @ResolveField()
@@ -53,5 +63,12 @@ export class PostsResolver {
     @Ctx() { useLikeLoaderForPost }: Context,
   ) {
     return useLikeLoaderForPost.load(parent.postId);
+  }
+  @ResolveField()
+  async replies(
+    @Parent() parent: Post,
+    @Ctx() { useReplyLoaderForPost }: Context,
+  ) {
+    return useReplyLoaderForPost.load(parent.postId);
   }
 }

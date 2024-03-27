@@ -37,6 +37,7 @@ import { Request } from 'express';
               usePostedByLoader: postdl.usePostedByLoader(),
               useLikeLoaderForPost: postdl.useLikeLoaderForPost(),
               useLikesForUserLoader: dataLoader.useLikesForUserLoader(),
+              useReplyLoaderForPost: postdl.useReplyLoaderForPost(),
               req: req,
               res: res,
             };

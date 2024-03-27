@@ -7,6 +7,14 @@ type Post {
   updatedAt: Date!
   likes: [Like]
   postedBy: User!
+  replies: [Reply]
+}
+
+type Reply {
+  postId: String!
+  userId: String!
+  createdAt: Date!
+  updatedAt: Date!
 }
 
 input CreatePostInput {
@@ -30,6 +38,7 @@ input UpdatePostInput {
 type Query {
   posts: [Post]!
   post(id: String!): Post
+  feed: [Post]
 }
 
 type Mutation {

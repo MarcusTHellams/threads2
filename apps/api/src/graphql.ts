@@ -67,6 +67,8 @@ export abstract class IQuery {
 
     abstract post(id: string): Nullable<Post> | Promise<Nullable<Post>>;
 
+    abstract feed(): Nullable<Nullable<Post>[]> | Promise<Nullable<Nullable<Post>[]>>;
+
     abstract users(): Nullable<User>[] | Promise<Nullable<User>[]>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
@@ -81,6 +83,14 @@ export class Post {
     updatedAt: Date;
     likes?: Nullable<Nullable<Like>[]>;
     postedBy: User;
+    replies?: Nullable<Nullable<Reply>[]>;
+}
+
+export class Reply {
+    postId: string;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export abstract class IMutation {

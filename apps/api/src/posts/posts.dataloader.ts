@@ -59,4 +59,27 @@ export class PostDataLoader {
   public useLikeLoaderForPost() {
     return new DataLoader(this.batchLikes());
   }
+  private batchReplies() {
+    return async function (ids: string[]) {
+      const posts = await this.db.query.post.findMany({
+        where({ postId }, { inArray }) {
+          return inArray(postId, ids);
+        },
+        columns: { postId: true },
+        with: {
+          replies: true,
+        },
+      });
+      const keyedByFollowers = keyBy(posts, (post) => {
+        return post.postId;
+      });
+
+      return ids.map((id) => {
+        return keyedByFollowers[id].replies;
+      });
+    };
+  }
+  public useReplyLoaderForPost() {
+    return new DataLoader(this.batchReplies());
+  }
 }
