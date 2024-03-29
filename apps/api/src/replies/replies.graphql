@@ -1,0 +1,9 @@
+type Reply {
+  text: String!
+  postId: String!
+  userId: String!
+  createdAt: Date!
+  updatedAt: Date!
+  postedBy: User!
+  post: Post!
+}

@@ -1,16 +1,16 @@
 import { create } from 'zustand';
-import { PostSelect } from 'database';
+import { PostResponse } from '../common/types';
 
 type PostStoreState = {
-  posts: PostSelect[];
+  posts: PostResponse[];
 };
 
 type PostStoreActions = {
-  setPosts: (posts: PostSelect[]) => void;
+  setPosts: (posts: PostResponse[]) => void;
 };
 export const usePostStore = create<PostStoreState & PostStoreActions>(
   (set) => ({
     posts: [],
-    setPosts: (posts: PostSelect[]) => set(() => ({ posts })),
+    setPosts: (posts: PostResponse[]) => set(() => ({ posts })),
   }),
 );

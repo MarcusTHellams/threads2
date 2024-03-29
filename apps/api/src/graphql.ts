@@ -86,13 +86,6 @@ export class Post {
     replies?: Nullable<Nullable<Reply>[]>;
 }
 
-export class Reply {
-    postId: string;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-}
-
 export abstract class IMutation {
     abstract createPost(createPostInput: CreatePostInput): Post | Promise<Post>;
 
@@ -107,6 +100,16 @@ export abstract class IMutation {
     abstract removeUser(id: string): Nullable<User> | Promise<Nullable<User>>;
 
     abstract likeAPost(likeAPostInput: LikeAPostInput): Nullable<Post> | Promise<Nullable<Post>>;
+}
+
+export class Reply {
+    text: string;
+    postId: string;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    postedBy: User;
+    post: Post;
 }
 
 export class User {

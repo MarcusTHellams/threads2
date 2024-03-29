@@ -96,7 +96,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
               <Avatar
                 size="xs"
                 name="John doe"
-                src={post.replies[0].userProfilePic}
+                src={post.replies[0].postedBy.profilePic}
                 position={'absolute'}
                 top={'0px'}
                 left="15px"
@@ -108,7 +108,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
               <Avatar
                 size="xs"
                 name="John doe"
-                src={post.replies[1].userProfilePic}
+                src={post.replies[1].postedBy.profilePic}
                 position={'absolute'}
                 bottom={'0px'}
                 right="-5px"
@@ -120,7 +120,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
               <Avatar
                 size="xs"
                 name="John doe"
-                src={post.replies[2].userProfilePic}
+                src={post.replies[2].postedBy.profilePic}
                 position={'absolute'}
                 bottom={'0px'}
                 left="4px"

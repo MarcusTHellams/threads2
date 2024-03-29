@@ -20,24 +20,32 @@ import { PostDataLoader } from './posts/posts.dataloader';
 import { AuthModule } from './auth/auth.module';
 import { HelloWorldResolver } from './hello-world/hello-world.resolver';
 import { Request } from 'express';
+import { RepliesModule } from './replies/replies.module';
+import { RepliesDataLoader } from './replies/replies.dataloader';
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [UsersModule, PostsModule],
-      inject: [UserDataLoader, PostDataLoader],
-      async useFactory(dataLoader: UserDataLoader, postdl: PostDataLoader) {
+      imports: [UsersModule, PostsModule, RepliesModule],
+      inject: [UserDataLoader, PostDataLoader, RepliesDataLoader],
+      async useFactory(
+        dataLoader: UserDataLoader,
+        postDl: PostDataLoader,
+        repliesDl: RepliesDataLoader,
+      ) {
         return {
           context({ req, res }): Context {
             return {
               userFolloweeLoader: dataLoader.useFolloweeLoader(),
               userFollowLoader: dataLoader.useFollowerLoader(),
               usePostsLoader: dataLoader.usePostsLoader(),
-              usePostedByLoader: postdl.usePostedByLoader(),
-              useLikeLoaderForPost: postdl.useLikeLoaderForPost(),
+              usePostedByLoader: postDl.usePostedByLoader(),
+              useLikeLoaderForPost: postDl.useLikeLoaderForPost(),
               useLikesForUserLoader: dataLoader.useLikesForUserLoader(),
-              useReplyLoaderForPost: postdl.useReplyLoaderForPost(),
+              useReplyLoaderForPost: postDl.useReplyLoaderForPost(),
+              repliesPostedByViaPostId: repliesDl.repliesPostedByViaPostId(),
+              repliesPostViaPostId: repliesDl.repliesPostViaPostId(),
               req: req,
               res: res,
             };
@@ -61,6 +69,7 @@ import { Request } from 'express';
     UsersModule,
     PostsModule,
     AuthModule,
+    RepliesModule,
   ],
   controllers: [AppController],
   providers: [AppService, HelloWorldResolver],

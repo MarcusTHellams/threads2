@@ -10,13 +10,6 @@ type Post {
   replies: [Reply]
 }
 
-type Reply {
-  postId: String!
-  userId: String!
-  createdAt: Date!
-  updatedAt: Date!
-}
-
 input CreatePostInput {
   postId: String
   userId: String!

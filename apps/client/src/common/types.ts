@@ -26,4 +26,14 @@ export interface PostResponse {
   updatedAt: string;
   userId: string;
   postedBy: UserResponse;
+  replies: ReplyResponse[];
+}
+export interface ReplyResponse {
+  createdAt: string;
+  text: string;
+  postId: string;
+  updatedAt: string;
+  userId: string;
+  postedBy: UserResponse;
+  post: PostResponse;
 }
