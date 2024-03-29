@@ -1,5 +1,11 @@
 import { InferInsertModel, InferSelectModel, relations } from 'drizzle-orm';
-import { pgTable, primaryKey, timestamp, uuid } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  primaryKey,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import { post, user } from '.';
 
@@ -18,6 +24,7 @@ export const reply = pgTable(
         onDelete: 'cascade',
         onUpdate: 'cascade',
       }),
+    text: text('text').notNull(),
     createdAt: timestamp('createdAt', { mode: 'date', withTimezone: true })
       .defaultNow()
       .notNull(),
