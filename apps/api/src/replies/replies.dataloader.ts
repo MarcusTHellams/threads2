@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import DataLoader from 'dataloader';
 import keyBy from 'lodash/keyBy';
+import groupBy from 'lodash/groupBy';
 import {
   DrizzleService,
   type DatabaseClient,
@@ -24,12 +25,12 @@ export class RepliesDataLoader {
           postedBy: true,
         },
       });
-      const keyedByFollowers = keyBy(posts, (post) => {
+      const keyedByFollowers = groupBy(posts, (post) => {
         return post.postId;
       });
 
       return ids.map((id) => {
-        return keyedByFollowers[id].postedBy;
+        return keyedByFollowers[id].map((item) => item.postedBy);
       });
     };
   }
@@ -48,12 +49,12 @@ export class RepliesDataLoader {
           post: true,
         },
       });
-      const keyedByFollowers = keyBy(posts, (post) => {
+      const keyedByFollowers = groupBy(posts, (post) => {
         return post.postId;
       });
 
       return ids.map((id) => {
-        return keyedByFollowers[id].post;
+        return keyedByFollowers[id].map((item) => item.post);
       });
     };
   }

@@ -26,6 +26,11 @@ export class UpdatePostInput {
     updatedAt?: Nullable<Date>;
 }
 
+export class ReplyToAPostInput {
+    postId: string;
+    text: string;
+}
+
 export class CreateUserInput {
     name: string;
     email: string;
@@ -47,19 +52,6 @@ export class UpdateUserInput {
     updatedAt?: Nullable<Date>;
 }
 
-export class LikeAPostInput {
-    postId: string;
-    userId: string;
-}
-
-export class Like {
-    postId: string;
-    userId: string;
-    createdAt: Date;
-    updatedAt: Date;
-    user: User;
-}
-
 export abstract class IQuery {
     abstract helloWorld(): string | Promise<string>;
 
@@ -72,6 +64,15 @@ export abstract class IQuery {
     abstract users(): Nullable<User>[] | Promise<Nullable<User>[]>;
 
     abstract user(id: string): Nullable<User> | Promise<Nullable<User>>;
+}
+
+export class Like {
+    postId: string;
+    userId: string;
+    createdAt: Date;
+    updatedAt: Date;
+    post: Post;
+    user: User;
 }
 
 export class Post {
@@ -91,18 +92,21 @@ export abstract class IMutation {
 
     abstract updatePost(updatePostInput: UpdatePostInput): Post | Promise<Post>;
 
-    abstract removePost(id: string): Nullable<Post> | Promise<Nullable<Post>>;
+    abstract removePost(id: string): Post | Promise<Post>;
+
+    abstract likePost(postId: string): Post | Promise<Post>;
+
+    abstract replyToAPost(replyToAPostInput: ReplyToAPostInput): Post | Promise<Post>;
 
     abstract createUser(createUserInput: CreateUserInput): User | Promise<User>;
 
     abstract updateUser(updateUserInput: UpdateUserInput): User | Promise<User>;
 
     abstract removeUser(id: string): Nullable<User> | Promise<Nullable<User>>;
-
-    abstract likeAPost(likeAPostInput: LikeAPostInput): Nullable<Post> | Promise<Nullable<Post>>;
 }
 
 export class Reply {
+    replyId: string;
     text: string;
     postId: string;
     userId: string;

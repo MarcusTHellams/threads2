@@ -1,38 +1,45 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
-import { DrizzleModule } from './drizzle/drizzle.module';
-import { ConfigModule } from '@nestjs/config';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
-import { UsersModule } from './users/users.module';
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+import { ServeStaticModule } from '@nestjs/serve-static';
 import {
   resolvers as scalarResolvers,
   typeDefs as scalarTypeDefs,
 } from 'graphql-scalars';
-import { UserDataLoader } from './users/users.dataloader';
-import { Context } from './common/types';
-import { PostsModule } from './posts/posts.module';
-import { PostDataLoader } from './posts/posts.dataloader';
+import { resolve } from 'path';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { Context } from './common/types';
+import { DrizzleModule } from './drizzle/drizzle.module';
 import { HelloWorldResolver } from './hello-world/hello-world.resolver';
-import { Request } from 'express';
-import { RepliesModule } from './replies/replies.module';
+import { LikesDataLoader } from './likes/likes.dataloader';
+import { LikesModule } from './likes/likes.module';
+import { PostDataLoader } from './posts/posts.dataloader';
+import { PostsModule } from './posts/posts.module';
 import { RepliesDataLoader } from './replies/replies.dataloader';
+import { RepliesModule } from './replies/replies.module';
+import { UserDataLoader } from './users/users.dataloader';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
     GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      imports: [UsersModule, PostsModule, RepliesModule],
-      inject: [UserDataLoader, PostDataLoader, RepliesDataLoader],
+      imports: [UsersModule, PostsModule, RepliesModule, LikesModule],
+      inject: [
+        UserDataLoader,
+        PostDataLoader,
+        RepliesDataLoader,
+        LikesDataLoader,
+      ],
       async useFactory(
         dataLoader: UserDataLoader,
         postDl: PostDataLoader,
         repliesDl: RepliesDataLoader,
+        likesDl: LikesDataLoader,
       ) {
         return {
           context({ req, res }): Context {
@@ -46,6 +53,8 @@ import { RepliesDataLoader } from './replies/replies.dataloader';
               useReplyLoaderForPost: postDl.useReplyLoaderForPost(),
               repliesPostedByViaPostId: repliesDl.repliesPostedByViaPostId(),
               repliesPostViaPostId: repliesDl.repliesPostViaPostId(),
+              likesPostViaPostId: likesDl.likesPostViaPostId(),
+              likesUserViaPostId: likesDl.likesUserViaPostId(),
               req: req,
               res: res,
             };
@@ -62,7 +71,7 @@ import { RepliesDataLoader } from './replies/replies.dataloader';
       isGlobal: true,
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '../../client/dist'),
+      rootPath: resolve(__dirname, '../../../', 'client/dist/'),
       exclude: ['/api/(.*)', '/graphql/(.*)'],
     }),
     DrizzleModule,
@@ -70,6 +79,7 @@ import { RepliesDataLoader } from './replies/replies.dataloader';
     PostsModule,
     AuthModule,
     RepliesModule,
+    LikesModule,
   ],
   controllers: [AppController],
   providers: [AppService, HelloWorldResolver],

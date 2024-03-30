@@ -8,7 +8,12 @@ import {
   Context as Ctx,
 } from '@nestjs/graphql';
 import { PostsService } from './posts.service';
-import { CreatePostInput, Post, UpdatePostInput } from 'src/graphql';
+import {
+  CreatePostInput,
+  Post,
+  ReplyToAPostInput,
+  UpdatePostInput,
+} from 'src/graphql';
 import { Context } from 'src/common/types';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/accessTokenGraphql.guard';
@@ -48,6 +53,18 @@ export class PostsResolver {
   @Mutation('removePost')
   remove(@Args('id') postId: string) {
     return this.postsService.remove(postId);
+  }
+  @Mutation('likePost')
+  likePost(@Args('postId') postId: string, @CurrentUser() user: UserSelect) {
+    return this.postsService.likePost(postId, user);
+  }
+
+  @Mutation('replyToAPost')
+  replyToAPost(
+    @Args('replyToAPostInput') replyToAPostInput: ReplyToAPostInput,
+    @CurrentUser() user: UserSelect,
+  ) {
+    return this.postsService.replyToAPost(replyToAPostInput, user);
   }
 
   @ResolveField()

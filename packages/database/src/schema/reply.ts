@@ -12,6 +12,7 @@ import { post, user } from '.';
 export const reply = pgTable(
   'Reply',
   {
+    replyId: uuid('replyId').defaultRandom().primaryKey(),
     postId: uuid('postId')
       .notNull()
       .references(() => post.postId, {
@@ -32,10 +33,7 @@ export const reply = pgTable(
       mode: 'date',
       withTimezone: true,
     }).notNull(),
-  },
-  (t) => ({
-    pk: primaryKey({ columns: [t.postId, t.userId] }),
-  })
+  }
 );
 
 export const replyRelations = relations(reply, ({ one }) => ({

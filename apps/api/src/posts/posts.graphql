@@ -28,6 +28,11 @@ input UpdatePostInput {
   updatedAt: Date
 }
 
+input ReplyToAPostInput {
+  postId: String!
+  text: String!
+}
+
 type Query {
   posts: [Post]!
   post(id: String!): Post
@@ -37,5 +42,7 @@ type Query {
 type Mutation {
   createPost(createPostInput: CreatePostInput!): Post!
   updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: String!): Post
+  removePost(id: String!): Post!
+  likePost(postId: String!): Post!
+  replyToAPost(replyToAPostInput: ReplyToAPostInput!): Post!
 }

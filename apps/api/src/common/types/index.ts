@@ -11,8 +11,10 @@ export type Context = {
   useLikeLoaderForPost: DataLoader<string, LikeSelect[], string>;
   useLikesForUserLoader: DataLoader<string, LikeSelect[], string>;
   useReplyLoaderForPost: DataLoader<string, ReplySelect[], string>;
-  repliesPostedByViaPostId: DataLoader<string, UserSelect, string>;
-  repliesPostViaPostId: DataLoader<string, PostSelect, string>;
+  repliesPostedByViaPostId: DataLoader<string, UserSelect[], string>;
+  repliesPostViaPostId: DataLoader<string, PostSelect[], string>;
+  likesPostViaPostId: DataLoader<string, PostSelect[], string>;
+  likesUserViaPostId: DataLoader<string, UserSelect[], string>;
   req: Request;
   res: Response;
 };

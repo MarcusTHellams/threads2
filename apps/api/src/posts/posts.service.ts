@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { CreatePostInput, UpdatePostInput } from 'src/graphql';
+import {
+  CreatePostInput,
+  ReplyToAPostInput,
+  UpdatePostInput,
+} from 'src/graphql';
 import { DatabaseClient, DrizzleService } from 'src/drizzle/drizzle.service';
-import { post } from 'database';
+import { post, like, reply } from 'database';
 import { UserSelect } from 'database';
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 
 @Injectable()
 export class PostsService {
@@ -19,6 +23,55 @@ export class PostsService {
       .values(createPostInput)
       .returning()
       .then((resp) => resp[0]);
+  }
+
+  async likePost(postId: string, user: UserSelect) {
+    return this.db.transaction(async (tx) => {
+      const findPost = () => {
+        return tx.query.post.findFirst({
+          where(fields, { eq }) {
+            return eq(fields.postId, postId);
+          },
+        });
+      };
+      const likedPost = await tx.query.like.findFirst({
+        where(fields, { eq, and }) {
+          return and(eq(fields.postId, postId), eq(fields.userId, user.userId));
+        },
+      });
+
+      if (likedPost) {
+        await tx
+          .delete(like)
+          .where(and(eq(like.postId, postId), eq(like.userId, user.userId)));
+
+        return findPost();
+      }
+      await tx
+        .insert(like)
+        .values({
+          updatedAt: new Date(),
+          postId,
+          userId: user.userId,
+        })
+        .returning()
+        .then((resp) => resp[0]);
+      return findPost();
+    });
+  }
+
+  async replyToAPost({ postId, text }: ReplyToAPostInput, user: UserSelect) {
+    return this.db.transaction(async (tx) => {
+      await tx.insert(reply).values({
+        postId,
+        text,
+        updatedAt: new Date(),
+        userId: user.userId,
+      });
+      return tx.query.post.findFirst({
+        where: eq(post.postId, postId),
+      });
+    });
   }
 
   async feed(user: UserSelect) {

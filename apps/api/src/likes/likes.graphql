@@ -1,10 +1,8 @@
-type Reply {
-  replyId: String!
-  text: String!
+type Like {
   postId: String!
   userId: String!
   createdAt: Date!
   updatedAt: Date!
-  postedBy: User!
   post: Post!
+  user: User!
 }

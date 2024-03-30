@@ -6,7 +6,6 @@ import {
 } from 'src/drizzle/drizzle.service';
 import { user, UserInsert, like } from 'database';
 import { and, eq } from 'drizzle-orm';
-import { LikeAPostInput } from '../graphql';
 
 @Injectable()
 export class UsersService {
@@ -38,38 +37,6 @@ export class UsersService {
         return eq(userId, id);
       },
     });
-  }
-
-  async likeAPost(likeAPostInput: LikeAPostInput) {
-    const foundLike = await this.db.query.like.findFirst({
-      where({ postId, userId }, { and, eq }) {
-        return and(
-          eq(postId, likeAPostInput.postId),
-          eq(userId, likeAPostInput.userId),
-        );
-      },
-    });
-    if (foundLike) {
-      return this.db
-        .delete(like)
-        .where(
-          and(
-            eq(like.postId, likeAPostInput.postId),
-            eq(like.userId, likeAPostInput.userId),
-          ),
-        )
-        .returning()
-        .then((resp) => resp[0]);
-    }
-    return this.db
-      .insert(like)
-      .values({
-        postId: likeAPostInput.postId,
-        userId: likeAPostInput.userId,
-        updatedAt: new Date(),
-      })
-      .returning()
-      .then((resp) => resp[0]);
   }
 
   async update(id: string, updateUserInput: Partial<UserInsert>) {
