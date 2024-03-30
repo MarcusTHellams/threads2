@@ -34,7 +34,7 @@ export class AuthController {
     tokenAndCookieSender(res, tokens, user);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RefreshTokenGuard)
   @Get('ping')
   ping() {
     return true;
@@ -50,13 +50,12 @@ export class AuthController {
     tokenAndCookieSender(res, tokens, user);
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(AccessTokenGuard, RefreshTokenGuard)
   @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(req['user']['userId']);
-    res
-      .clearCookie('refreshToken', cookieOptions)
-      .send('Successfully Logged Out');
+    const { expires, ...rest } = cookieOptions;
+    res.clearCookie('refreshToken', rest).send('Successfully Logged Out');
   }
 
   @UseGuards(RefreshTokenGuard)
