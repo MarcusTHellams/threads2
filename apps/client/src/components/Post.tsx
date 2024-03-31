@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Avatar } from '@chakra-ui/avatar';
 import { Image } from '@chakra-ui/image';
 import { Box, Flex, Text } from '@chakra-ui/layout';
 import { Link, useNavigate } from 'react-router-dom';
-import Actions from './Actions';
+// import Actions from './Actions';
 import { useEffect } from 'react';
 import { useShowToast } from '../hooks/useShowToast';
 import { formatDistanceToNow } from 'date-fns';
@@ -18,7 +17,7 @@ import { REMOVE_POST } from '../graphql/mutations';
 
 type PostComponentType = {
   post: PostResponse;
-  postedBy: any;
+  postedBy: UserResponse;
 };
 
 const Post = ({ post, postedBy }: PostComponentType) => {
@@ -28,13 +27,13 @@ const Post = ({ post, postedBy }: PostComponentType) => {
   const navigate = useNavigate();
 
   const { data: user, error } = useQuery({
-    queryKey: ['user', postedBy],
+    queryKey: ['user', postedBy.userId],
     async queryFn() {
       return apolloClient
         .query<{ user: UserResponse }>({
           query: GET_USER,
           variables: {
-            id: postedBy,
+            id: postedBy.userId,
           },
         })
         .then(({ data: { user } }) => user);
@@ -42,7 +41,9 @@ const Post = ({ post, postedBy }: PostComponentType) => {
   });
 
   useEffect(() => {
-    showToast('Error', error!.message, 'error');
+    if (error) {
+      showToast('Error', error!.message, 'error');
+    }
   }, [error, showToast]);
 
   const { mutate: removePost } = useMutation<PostResponse, Error, string>({
@@ -67,7 +68,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
   });
 
   const handleDeletePost = async (
-    e: React.MouseEvent<SVGElement, MouseEvent>
+    e: React.MouseEvent<SVGElement, MouseEvent>,
   ) => {
     e.preventDefault();
     if (!window.confirm('Are you sure you want to delete this post?')) return;
@@ -91,8 +92,8 @@ const Post = ({ post, postedBy }: PostComponentType) => {
           />
           <Box w="1px" h={'full'} bg="gray.light" my={2}></Box>
           <Box position={'relative'} w={'full'}>
-            {post.replies.length === 0 && <Text textAlign={'center'}>🥱</Text>}
-            {post.replies[0] && (
+            {post?.replies?.length === 0 && <Text textAlign={'center'}>🥱</Text>}
+            {post?.replies?.[0] && (
               <Avatar
                 size="xs"
                 name="John doe"
@@ -104,11 +105,11 @@ const Post = ({ post, postedBy }: PostComponentType) => {
               />
             )}
 
-            {post.replies[1] && (
+            {post?.replies?.[1] && (
               <Avatar
                 size="xs"
                 name="John doe"
-                src={post.replies[1].postedBy.profilePic}
+                src={post?.replies?.[1].postedBy.profilePic}
                 position={'absolute'}
                 bottom={'0px'}
                 right="-5px"
@@ -116,7 +117,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
               />
             )}
 
-            {post.replies[2] && (
+            {post?.replies?.[2] && (
               <Avatar
                 size="xs"
                 name="John doe"
@@ -173,7 +174,7 @@ const Post = ({ post, postedBy }: PostComponentType) => {
           )}
 
           <Flex gap={3} my={1}>
-            <Actions post={post} />
+            {/* <Actions post={post} /> */}
           </Flex>
         </Flex>
       </Flex>

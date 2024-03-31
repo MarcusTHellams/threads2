@@ -34,7 +34,7 @@ export class AuthController {
     tokenAndCookieSender(res, tokens, user);
   }
 
-  @UseGuards(AccessTokenGuard, RefreshTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Get('ping')
   ping() {
     return true;
@@ -50,10 +50,11 @@ export class AuthController {
     tokenAndCookieSender(res, tokens, user);
   }
 
-  @UseGuards(AccessTokenGuard, RefreshTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Get('logout')
   async logout(@Req() req: Request, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(req['user']['userId']);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { expires, ...rest } = cookieOptions;
     res.clearCookie('refreshToken', rest).send('Successfully Logged Out');
   }

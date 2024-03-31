@@ -24,6 +24,39 @@ export const CORE_POST_FIELDS = gql`
   }
 `;
 
+export const FEED = gql`
+  ${CORE_POST_FIELDS}
+  ${CORE_USER_FIELDS}
+  query FEED {
+    feed {
+      ...CorePostFields
+      postedBy {
+        ...CoreUserFields
+      }
+      likes {
+        postId
+        userId
+        createdAt
+        updatedAt
+        user {
+          ...CoreUserFields
+        }
+      }
+      replies {
+        createdAt
+        updatedAt
+        postId
+        userId
+        replyId
+        text
+        postedBy {
+          ...CoreUserFields
+        }
+      }
+    }
+  }
+`;
+
 export const GET_USER = gql`
   ${CORE_USER_FIELDS}
   query GET_USER($id: String!) {

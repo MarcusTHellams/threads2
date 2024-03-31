@@ -37,8 +37,9 @@ export class PostDataLoader {
     return new DataLoader(this.batchPostedBy());
   }
   private batchLikes() {
+    const db = this.db;
     return async function (ids: string[]) {
-      const posts = await this.db.query.post.findMany({
+      const posts = await db.query.post.findMany({
         where({ postId }, { inArray }) {
           return inArray(postId, ids);
         },
@@ -60,8 +61,9 @@ export class PostDataLoader {
     return new DataLoader(this.batchLikes());
   }
   private batchReplies() {
+    const db = this.db;
     return async function (ids: string[]) {
-      const posts = await this.db.query.post.findMany({
+      const posts = await db.query.post.findMany({
         where({ postId }, { inArray }) {
           return inArray(postId, ids);
         },

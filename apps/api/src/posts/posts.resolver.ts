@@ -19,10 +19,14 @@ import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from 'src/auth/accessTokenGraphql.guard';
 import { CurrentUser } from 'src/auth/currentUser.decorator';
 import { UserSelect } from 'database';
+import { DrizzleService } from 'src/drizzle/drizzle.service';
 
 @Resolver('Post')
 export class PostsResolver {
-  constructor(private readonly postsService: PostsService) {}
+  constructor(
+    private readonly postsService: PostsService,
+    private readonly ds: DrizzleService,
+  ) {}
 
   @Mutation('createPost')
   create(@Args('createPostInput') createPostInput: CreatePostInput) {
